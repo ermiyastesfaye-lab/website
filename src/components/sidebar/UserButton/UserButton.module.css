@@ -1,0 +1,10 @@
+.user {
+  display: block;
+  width: 100%;
+  padding: var(--mantine-spacing-md);
+  color: white;
+
+  @mixin hover {
+    background-color: #2c3e50;
+  }
+}

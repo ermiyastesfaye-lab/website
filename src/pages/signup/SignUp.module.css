@@ -1,0 +1,22 @@
+.wrapper {
+  width: 60%;
+  height: 100vh;
+}
+
+.form {
+  max-width: 800px;
+  padding: 80px 200px 0 200px;
+  border-radius: 0;
+
+  @media (max-width: var(--mantine-breakpoint-sm)) {
+    max-width: 100%;
+  }
+}
+
+.title {
+  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+  font-family: Outfit, var(--mantine-font-family);
+  font-weight: 500;
+  margin-top: var(--mantine-spacing-md);
+  margin-bottom: 20px !important;
+}
