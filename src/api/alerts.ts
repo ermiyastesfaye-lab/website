@@ -2,6 +2,8 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 export interface Alert {
   id: string;
   type: string;
@@ -14,15 +16,12 @@ export interface Alert {
 }
 
 export async function fetchAlerts(token: string): Promise<Alert[]> {
-  const response = await axios.get(
-    "https://6jm979tt-5000.euw.devtunnels.ms/v1/alerts",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "x-client-type": "provider",
-      },
-    }
-  );
+  const response = await axios.get(`${BASE_URL}/alerts`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "x-client-type": "provider",
+    },
+  });
   // The API returns { data: { alerts: Alert[], count: number } }
   const apiData = response.data?.data;
   if (apiData && Array.isArray(apiData.alerts)) {
@@ -47,7 +46,7 @@ export function useAlertsPolling(
       setLoading(true);
       try {
         // Only add lotId if it's a non-empty string and not 'all'
-        let url = "https://6jm979tt-5000.euw.devtunnels.ms/v1/alerts";
+        let url = `${BASE_URL}/alerts`;
         if (lotId && lotId !== "all") {
           url += `?lotId=${encodeURIComponent(lotId)}`;
         }

@@ -12,6 +12,7 @@ import { EmployeeInviteSignUp } from "./pages/signup/EmployeeInviteSignUp";
 import ReservationDetail from "./pages/reservations/ReservationDetail";
 import AlertsPage from "./pages/alerts/AlertsPage";
 import WalkInReservation from "./pages/reservations/WalkInReservation";
+import PricingManagement from "./pages/pricing";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="/reservations/detail" element={<ReservationDetail />} />
           <Route path="/alerts" element={<AlertsPage />} />
           <Route path="/reservations/walkin" element={<WalkInReservation />} />
+          <Route path="/pricing" element={<PricingManagement />} />
         </Route>
       </Route>
     </Routes>

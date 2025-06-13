@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 export interface CreateLotPayload {
   name: string;
   capacity: number;
@@ -25,16 +27,12 @@ export async function createLot(payload: FormData, token: string) {
     for (const [key, value] of payload.entries()) {
       console.log(key, value);
     }
-    const response = await axios.post(
-      "https://6jm979tt-5000.euw.devtunnels.ms/v1/lots",
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "x-client-type": "provider",
-        },
-      }
-    );
+    const response = await axios.post(`${BASE_URL}/lots`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "x-client-type": "provider",
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error creating lot:", error);
@@ -43,15 +41,12 @@ export async function createLot(payload: FormData, token: string) {
 }
 
 export async function fetchLots(token: string): Promise<Lot[]> {
-  const response = await axios.get(
-    "https://6jm979tt-5000.euw.devtunnels.ms/v1/lots",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "x-client-type": "provider",
-      },
-    }
-  );
+  const response = await axios.get(`${BASE_URL}/lots`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "x-client-type": "provider",
+    },
+  });
   return response.data;
 }
 
@@ -62,16 +57,12 @@ export async function editLot(lotId: string, payload: FormData, token: string) {
     for (const [key, value] of payload.entries()) {
       console.log(key, value);
     }
-    const response = await axios.patch(
-      `https://6jm979tt-5000.euw.devtunnels.ms/v1/lots/${lotId}`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "x-client-type": "provider",
-        },
-      }
-    );
+    const response = await axios.patch(`${BASE_URL}/lots/${lotId}`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "x-client-type": "provider",
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error editing lot:", error);

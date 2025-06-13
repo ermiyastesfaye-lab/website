@@ -10,6 +10,7 @@ import {
   Notification,
   Divider,
   Badge,
+  Switch,
 } from "@mantine/core";
 import {
   IconCar,
@@ -20,6 +21,13 @@ import {
   IconArrowLeft,
 } from "@tabler/icons-react";
 import { fetchLots } from "../../api/lots";
+import { fetchZones } from "../../api/Zone";
+import {
+  walkInEntry,
+  reservationEntry,
+  walkInExit,
+  reservationExit,
+} from "../../api/walkInReservation";
 import type { Lot } from "../../api/lots";
 
 interface Reservation {
@@ -39,13 +47,16 @@ export default function WalkInReservation() {
   const [selectedLot, setSelectedLot] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [errors, setErrors] = useState<{ licensePlate?: string; lot?: string }>(
-    {}
-  );
+  const [errors, setErrors] = useState<{ lot?: string }>({});
   const [recentReservations, setRecentReservations] = useState<Reservation[]>(
     []
   );
   const [lots, setLots] = useState<Lot[]>([]);
+  const [showVehicleDetails, setShowVehicleDetails] = useState(false);
+  const [vehicle, setVehicle] = useState({ make: "", model: "", color: "" });
+  const [zoneId, setZoneId] = useState("");
+  const [zones, setZones] = useState<{ id: string; name: string }[]>([]);
+  const [exitIsWalkIn, setExitIsWalkIn] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -55,13 +66,21 @@ export default function WalkInReservation() {
       .catch(() => setLots([]));
   }, []);
 
-  const validateForm = () => {
-    const newErrors: { licensePlate?: string; lot?: string } = {};
-    if (!licensePlate.trim()) {
-      newErrors.licensePlate = "License plate is required";
-    } else if (!/^[A-Z0-9]{2,8}$/i.test(licensePlate.replace(/[-\s]/g, ""))) {
-      newErrors.licensePlate = "Please enter a valid license plate";
+  useEffect(() => {
+    if (selectedLot) {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      fetchZones(selectedLot, token)
+        .then((data) => setZones(data))
+        .catch(() => setZones([]));
+    } else {
+      setZones([]);
+      setZoneId("");
     }
+  }, [selectedLot]);
+
+  const validateForm = () => {
+    const newErrors: { lot?: string } = {};
     if (!selectedLot) {
       newErrors.lot = "Please select a parking lot";
     }
@@ -73,22 +92,85 @@ export default function WalkInReservation() {
     e.preventDefault();
     if (!validateForm()) return;
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    const selectedLotData = lots.find((lot) => lot.id === selectedLot);
-    const newReservation: Reservation = {
-      id: `RES${Date.now()}`,
-      licensePlate,
-      lotId: selectedLot,
-      lotName: selectedLotData?.name || "",
-      type: reservationType,
-      timestamp: new Date(),
-    };
-    setRecentReservations((prev) => [newReservation, ...prev.slice(0, 4)]);
-    setIsSubmitting(false);
-    setShowSuccess(true);
-    setLicensePlate("");
-    setSelectedLot("");
-    setTimeout(() => setShowSuccess(false), 2500);
+    setErrors({});
+    try {
+      let response;
+      if (reservationType === "entry") {
+        if (showVehicleDetails) {
+          response = await walkInEntry({
+            zoneId,
+            lotId: selectedLot,
+            licensePlate,
+            vehicle,
+          });
+          console.log("walkInEntry response:", response);
+          // Check for a success indicator in the response
+          if (!response || response.error || response.success === false) {
+            throw new Error(response?.message || "Walk-in entry failed.");
+          }
+        } else {
+          response = await reservationEntry({
+            licensePlate,
+            lotId: selectedLot,
+          });
+          console.log("reservationEntry response:", response);
+          if (!response || response.error || response.success === false) {
+            throw new Error(response?.message || "Reservation entry failed.");
+          }
+        }
+      } else {
+        // EXIT logic
+        if (exitIsWalkIn) {
+          response = await walkInExit({
+            licensePlate,
+            lotId: selectedLot,
+          });
+          console.log("walkInExit response:", response);
+          if (!response || response.error || response.success === false) {
+            throw new Error(response?.message || "Walk-in exit failed.");
+          }
+        } else {
+          response = await reservationExit({
+            licensePlate,
+            lotId: selectedLot,
+          });
+          console.log("reservationExit response:", response);
+          if (!response || response.error || response.success === false) {
+            throw new Error(response?.message || "Reservation exit failed.");
+          }
+        }
+      }
+      // Optionally, you can use response data for more info
+      const selectedLotData = lots.find((lot) => lot.id === selectedLot);
+      const newReservation: Reservation = {
+        id: `RES${Date.now()}`,
+        licensePlate,
+        lotId: selectedLot,
+        lotName: selectedLotData?.name || "",
+        type: reservationType,
+        timestamp: new Date(),
+        ...(showVehicleDetails && reservationType === "entry"
+          ? { vehicle, zoneId }
+          : {}),
+      };
+      setRecentReservations((prev) => [newReservation, ...prev.slice(0, 4)]);
+      setShowSuccess(true);
+      setLicensePlate("");
+      setSelectedLot("");
+      setVehicle({ make: "", model: "", color: "" });
+      setZoneId("");
+      setShowVehicleDetails(false);
+      setTimeout(() => setShowSuccess(false), 2500);
+    } catch (err: any) {
+      setErrors({
+        lot:
+          err?.message ||
+          err?.response?.data?.message ||
+          "Submission failed. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const formatLicensePlate = (value: string) => {
@@ -122,7 +204,7 @@ export default function WalkInReservation() {
           mt={67}
           style={{ color: "#1C5D66" }}
         >
-          Walk-in Reservation
+          Walk-in & Reservation
         </Title>
         <div style={{ textAlign: "center", color: "#666", marginBottom: 24 }}>
           Register a new entry or exit for a walk-in customer
@@ -168,16 +250,25 @@ export default function WalkInReservation() {
                 Exit
               </Button>
             </Group>
+            {reservationType === "exit" && (
+              <Group>
+                <Switch
+                  label="Is Walk-in Exit?"
+                  checked={exitIsWalkIn}
+                  onChange={(event) =>
+                    setExitIsWalkIn(event.currentTarget.checked)
+                  }
+                  mb={8}
+                />
+              </Group>
+            )}
             <TextInput
               label="License Plate Number"
               placeholder="ABC-123"
               value={licensePlate}
-              onChange={(e) =>
-                setLicensePlate(formatLicensePlate(e.target.value))
-              }
+              onChange={(e) => setLicensePlate(e.target.value)}
               leftSection={<IconCar size={18} />}
-              error={errors.licensePlate}
-              maxLength={8}
+              maxLength={9}
               required
             />
             <Select
@@ -223,6 +314,64 @@ export default function WalkInReservation() {
                   );
                 })()}
               </Paper>
+            )}
+            {reservationType === "entry" && (
+              <Switch
+                label="Add vehicle details (optional)"
+                checked={showVehicleDetails}
+                onChange={(event) =>
+                  setShowVehicleDetails(event.currentTarget.checked)
+                }
+                mb={showVehicleDetails ? 0 : 8}
+              />
+            )}
+            {reservationType === "entry" && showVehicleDetails && (
+              <Stack
+                gap="sm"
+                style={{
+                  background: "#f3f4f6",
+                  borderRadius: 8,
+                  padding: 12,
+                }}
+              >
+                <Select
+                  label="Zone"
+                  placeholder="Select a zone"
+                  data={zones.map((zone) => ({
+                    value: zone.id,
+                    label: zone.name,
+                  }))}
+                  value={zoneId}
+                  onChange={(val) => setZoneId(val || "")}
+                  disabled={zones.length === 0}
+                  required={false}
+                  searchable
+                />
+                <TextInput
+                  label="Vehicle Make"
+                  placeholder="e.g. Toyota"
+                  value={vehicle.make}
+                  onChange={(e) =>
+                    setVehicle((v) => ({ ...v, make: e.target.value }))
+                  }
+                />
+                <TextInput
+                  label="Vehicle Model"
+                  placeholder="e.g. Corolla"
+                  value={vehicle.model}
+                  onChange={(e) =>
+                    setVehicle((v) => ({ ...v, model: e.target.value }))
+                  }
+                />
+                <TextInput
+                  label="Vehicle Color"
+                  placeholder="e.g. Red"
+                  value={vehicle.color}
+                  onChange={(e) =>
+                    setVehicle((v) => ({ ...v, color: e.target.value }))
+                  }
+                />
+              </Stack>
             )}
             <Button
               type="submit"

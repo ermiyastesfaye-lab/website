@@ -1,6 +1,8 @@
 // src/api/registerEmployeeProvider.ts
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 export interface EmployeeData {
   name: string;
   phone: string;
@@ -22,8 +24,13 @@ export interface RegisterPayload {
 
 export async function registerEmployeeProvider(payload: RegisterPayload) {
   const response = await axios.post(
-    "https://6jm979tt-5000.euw.devtunnels.ms/v1/employees/auth/register",
-    payload
+    `${BASE_URL}/employees/auth/register`,
+    payload,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
   );
   return response.data;
 }

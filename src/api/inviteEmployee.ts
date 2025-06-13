@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 export interface InviteEmployeePayload {
   email: string;
   role: string;
@@ -10,16 +12,12 @@ export async function inviteEmployee(
   payload: InviteEmployeePayload,
   token: string
 ) {
-  const response = await axios.post(
-    "https://6jm979tt-5000.euw.devtunnels.ms/v1/employees/invite",
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "x-client-type": "provider",
-      },
-    }
-  );
+  const response = await axios.post(`${BASE_URL}/employees/invite`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
   return response.data;
 }
 
@@ -35,7 +33,7 @@ export async function invitedEmployeeSignUp(
   token: string
 ) {
   const response = await axios.post(
-    `https://6jm979tt-5000.euw.devtunnels.ms/v1/employees?token=${token}`,
+    `${BASE_URL}/employees?token=${token}`,
     payload,
     {
       headers: {
@@ -67,14 +65,10 @@ export interface EmployeesResponse {
 export async function fetchEmployees(
   token: string
 ): Promise<EmployeesResponse> {
-  const response = await axios.get(
-    "https://6jm979tt-5000.euw.devtunnels.ms/v1/employees",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "x-client-type": "provider",
-      },
-    }
-  );
+  const response = await axios.get(`${BASE_URL}/employees`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 }

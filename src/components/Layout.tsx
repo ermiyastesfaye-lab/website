@@ -1,6 +1,5 @@
 import {
   AppShell,
-  Burger,
   Group,
   NavLink,
   Button,
@@ -19,6 +18,7 @@ import {
   IconLogout,
   IconBell,
   IconArrowLeftRight, // <-- Add this import
+  IconCurrencyDollar, // <-- Add this import
 } from "@tabler/icons-react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import logo from "../assets/logo/Layer 1.svg";
@@ -150,6 +150,11 @@ export function Layout() {
       icon: <IconArrowLeftRight size="1.2rem" stroke={1.5} />,
     },
     {
+      to: "/pricing",
+      label: "Pricing",
+      icon: <IconCurrencyDollar size="1.2rem" stroke={1.5} />,
+    },
+    {
       to: "/settings",
       label: "Settings",
       icon: <IconSettings size="1.2rem" stroke={1.5} />,
@@ -167,7 +172,7 @@ export function Layout() {
   return (
     <AppShell
       header={{ height: 60 }}
-      navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !opened } }}
+      navbar={{ width: 300, breakpoint: "sm" }}
       padding="md"
     >
       <AppShell.Header>
@@ -178,12 +183,7 @@ export function Layout() {
         >
           <Group>
             <img src={logo} alt="Nova Logo" className="h-9 w-56 mr-2" />
-            <Burger
-              opened={opened}
-              onClick={toggle}
-              hiddenFrom="sm"
-              size="sm"
-            />
+            {/* Remove Burger button and collapse logic */}
           </Group>
           <Group>
             {/* Notification Bell with Badge and Dropdown */}
@@ -281,10 +281,15 @@ export function Layout() {
       <AppShell.Navbar
         p="md"
         style={{
+          position: "fixed",
+          left: 0,
+          top: 60, // header height
+          height: "calc(100vh - 60px)",
+          zIndex: 100,
           paddingLeft: 0,
           paddingRight: 0,
-          width: opened ? 300 : 80,
-          transition: "width 0.2s",
+          width: 300,
+          transition: undefined,
         }}
       >
         <div
@@ -295,67 +300,29 @@ export function Layout() {
             width: "100%",
           }}
         >
-          <div className="w-full flex items-center justify-center mt-2">
-            <button
-              onClick={toggle}
-              className="ml-auto p-2 focus:outline-none"
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-              aria-label={opened ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {opened ? (
-                  <path
-                    d="M15 19L8 12L15 5"
-                    stroke="#1C5D66"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                ) : (
-                  <path
-                    d="M9 5L16 12L9 19"
-                    stroke="#1C5D66"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
           {navLinks.map((link) => (
             <NavLink
               key={link.to}
               component={Link}
               to={link.to}
               leftSection={link.icon}
-              label={opened ? link.label : undefined}
+              label={link.label}
               style={{
                 width: "100%",
-                justifyContent: opened ? "flex-start" : "center",
-                paddingLeft: opened ? 16 : 0,
-                paddingRight: opened ? 16 : 0,
-                fontSize: opened ? 20 : 24,
+                justifyContent: "flex-start",
+                paddingLeft: 16,
+                paddingRight: 16,
+                fontSize: 20,
                 minHeight: 56,
               }}
-              className={opened ? "" : "justify-center"}
+              className={""}
               onClick={link.onClick}
             />
           ))}
         </div>
       </AppShell.Navbar>
 
-      <AppShell.Main>
+      <AppShell.Main style={{ marginLeft: 40 }}>
         <Outlet />
         {/* Invite Modal */}
         <Modal
