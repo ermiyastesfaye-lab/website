@@ -165,7 +165,7 @@ export function Layout() {
       icon: <IconLogout size="1.2rem" stroke={1.5} />,
       onClick: () => {
         localStorage.removeItem("token");
-        navigate("/login");
+        navigate("/");
       },
     },
   ];
