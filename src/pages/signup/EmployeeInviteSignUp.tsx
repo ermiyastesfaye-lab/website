@@ -52,7 +52,7 @@ export function EmployeeInviteSignUp() {
       );
       setStatus("success");
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 1200);
     } catch (err: any) {
       console.error("Signup error:", err);

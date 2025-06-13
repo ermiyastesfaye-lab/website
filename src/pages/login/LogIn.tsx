@@ -29,7 +29,7 @@ export function LogIn() {
       const res = await loginEmployee({ email, password });
       localStorage.setItem("token", res.token);
       // Optionally handle rememberMe logic here
-      navigate("/"); // Redirect to dashboard or desired page
+      navigate("/dashboard"); // Redirect to dashboard or desired page
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed.");
     } finally {
@@ -84,7 +84,7 @@ export function LogIn() {
           </form>
           <Text ta="center" mt="md">
             Don't have an account?{" "}
-            <Link to="/" className="text-secondary font-bold">
+            <Link to="/signup" className="text-secondary font-bold">
               Sign up
             </Link>
           </Text>

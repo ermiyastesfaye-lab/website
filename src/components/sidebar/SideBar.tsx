@@ -12,7 +12,7 @@ import { LinksGroup } from "./NavBarLinksGroup/NavBarLinksGroup";
 import { UserButton } from "./UserButton/UserButton";
 
 const mockdata = [
-  { label: "Dashboard", icon: IconLayoutDashboard, link: "/" },
+  { label: "Dashboard", icon: IconLayoutDashboard, link: "/dashboard" },
   { label: "Employees", icon: IconUsers, link: "/employees" },
   { label: "Lots", icon: IconBuilding, link: "/lots" },
   { label: "Reservations", icon: IconCalendarEvent, link: "/reservations" },

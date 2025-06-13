@@ -49,7 +49,7 @@ export function CreateCompany() {
       };
       await registerEmployeeProvider(payload);
       localStorage.removeItem("signupForm");
-      navigate("/"); // Redirect after success
+      navigate("/dashboard"); // Redirect after success
     } catch (err: any) {
       setError(err.message || "Failed to register.");
     } finally {
@@ -104,7 +104,7 @@ export function CreateCompany() {
             </div>
             {error && <Text color="red">{error}</Text>}
             <div className="flex gap-10">
-              <Link to="/" className="w-full">
+              <Link to="/signup" className="w-full">
                 <button className="w-full mt-4 py-2 px-4 rounded-md bg-secondary text-white transition-colors duration-200 font-bold">
                   BACK
                 </button>
@@ -121,7 +121,7 @@ export function CreateCompany() {
 
           <Text ta="center" mt="md">
             Already have an account?{" "}
-            <Link to="/login" className="text-secondary font-bold">
+            <Link to="/" className="text-secondary font-bold">
               Log in
             </Link>
           </Text>

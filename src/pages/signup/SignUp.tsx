@@ -90,7 +90,7 @@ export function SignUp() {
 
           <Text ta="center" mt="md">
             Already have an account?{" "}
-            <Link to="/login" className="text-secondary font-bold">
+            <Link to="/" className="text-secondary font-bold">
               Log in
             </Link>
           </Text>

@@ -125,7 +125,7 @@ export function Layout() {
 
   const navLinks = [
     {
-      to: "/",
+      to: "/dashboard",
       label: "Dashboard",
       icon: <IconDashboard size="1.2rem" stroke={1.5} />,
     },
@@ -160,11 +160,12 @@ export function Layout() {
       icon: <IconSettings size="1.2rem" stroke={1.5} />,
     },
     {
-      to: "/logout",
+      to: "/",
       label: "Logout",
       icon: <IconLogout size="1.2rem" stroke={1.5} />,
       onClick: () => {
-        window.location.href = "/login";
+        localStorage.removeItem("token");
+        navigate("/login");
       },
     },
   ];

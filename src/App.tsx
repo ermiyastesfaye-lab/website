@@ -19,14 +19,14 @@ function App() {
     <Routes>
       {/* Auth Routes */}
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/login" element={<LogIn />} />
+      <Route path="/" element={<LogIn />} />
       <Route path="/createcompany" element={<CreateCompany />} />
       <Route path="/add-employee" element={<EmployeeInviteSignUp />} />
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/employees" element={<Employee />} />
           <Route path="/lots" element={<Lots />} />
           <Route path="/reservations" element={<Reservations />} />
